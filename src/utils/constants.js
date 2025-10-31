@@ -18,7 +18,7 @@ export const SA_BOUNDS = [
   [-22.0, 33.0]  // Northeast
 ];
 
-// SSP Scenarios
+// SSP Scenarios (fallback - these can be fetched from /api/climate-data/scenarios)
 export const SCENARIOS = [
   { value: 'ssp126', label: 'SSP1-2.6 (Low Emissions)', description: 'Sustainability pathway' },
   { value: 'ssp245', label: 'SSP2-4.5 (Medium Emissions)', description: 'Middle-of-the-road pathway' },
@@ -26,7 +26,7 @@ export const SCENARIOS = [
   { value: 'ssp585', label: 'SSP5-8.5 (Very High Emissions)', description: 'Fossil-fueled development' }
 ];
 
-// Time Periods
+// Time Periods (fallback - these can be fetched from /api/climate-data/periods)
 export const PERIODS = [
   {
     value: 'near-term_2021-2040',
@@ -47,6 +47,46 @@ export const PERIODS = [
     end: 2100
   }
 ];
+
+/**
+ * Format scenario from API response to display format
+ * @param {string} scenario - Scenario code from API (e.g., 'ssp245')
+ * @returns {Object} Formatted scenario with label and description
+ */
+export const formatScenario = (scenario) => {
+  const scenarioMap = {
+    'ssp126': { label: 'SSP1-2.6', shortLabel: 'Low Emissions', description: 'Sustainability pathway' },
+    'ssp245': { label: 'SSP2-4.5', shortLabel: 'Medium Emissions', description: 'Middle-of-the-road pathway' },
+    'ssp370': { label: 'SSP3-7.0', shortLabel: 'High Emissions', description: 'Regional rivalry pathway' },
+    'ssp585': { label: 'SSP5-8.5', shortLabel: 'Very High Emissions', description: 'Fossil-fueled development' }
+  };
+  return scenarioMap[scenario] || { label: scenario, shortLabel: scenario, description: '' };
+};
+
+/**
+ * Format period from API response to display format
+ * @param {string} period - Period code from API (e.g., 'near-term_2021-2040')
+ * @param {number} periodStart - Start year from API
+ * @param {number} periodEnd - End year from API
+ * @returns {Object} Formatted period with label
+ */
+export const formatPeriod = (period, periodStart, periodEnd) => {
+  if (periodStart && periodEnd) {
+    return {
+      value: period,
+      label: `${periodStart}-${periodEnd}`,
+      start: periodStart,
+      end: periodEnd
+    };
+  }
+
+  const periodMap = {
+    'near-term_2021-2040': { label: 'Near-term (2021-2040)', shortLabel: '2021-2040' },
+    'mid-term_2041-2060': { label: 'Mid-term (2041-2060)', shortLabel: '2041-2060' },
+    'far-term_2081-2100': { label: 'Far-term (2081-2100)', shortLabel: '2081-2100' }
+  };
+  return periodMap[period] || { label: period, shortLabel: period };
+};
 
 // Climate Index Categories
 export const CATEGORIES = [

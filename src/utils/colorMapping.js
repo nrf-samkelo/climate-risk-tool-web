@@ -167,6 +167,115 @@ export const extractValuesFromGeoJSON = (geojson) => {
 };
 
 /**
+ * Extract metadata from GeoJSON response
+ * Uses the first feature's properties to get scenario, period, and index info
+ * @param {Object} geojson - GeoJSON FeatureCollection from API
+ * @returns {Object} Metadata {scenario, period, periodStart, periodEnd, indexCode}
+ */
+export const extractMetadataFromGeoJSON = (geojson) => {
+  if (!geojson || !geojson.features || geojson.features.length === 0) {
+    return null;
+  }
+
+  const firstFeature = geojson.features[0];
+  const props = firstFeature.properties;
+
+  return {
+    scenario: props.scenario,
+    period: props.period,
+    periodStart: props.period_start,
+    periodEnd: props.period_end,
+    indexCode: props.index_code,
+  };
+};
+
+/**
+ * Extract all unique municipalities from GeoJSON
+ * @param {Object} geojson - GeoJSON FeatureCollection
+ * @returns {Array} Array of municipality objects
+ */
+export const extractMunicipalitiesFromGeoJSON = (geojson) => {
+  if (!geojson || !geojson.features) {
+    return [];
+  }
+
+  return geojson.features.map(feature => ({
+    id: feature.properties.id,
+    name: feature.properties.municipality_name,
+    code: feature.properties.municipality_code,
+    province: feature.properties.province,
+    districtCode: feature.properties.district_code,
+    districtName: feature.properties.district_name,
+    centroidLat: feature.properties.centroid_lat,
+    centroidLon: feature.properties.centroid_lon,
+    areaKm2: feature.properties.area_km2,
+    value: feature.properties.value,
+  }));
+};
+
+/**
+ * Group municipalities by district from GeoJSON
+ * @param {Object} geojson - GeoJSON FeatureCollection
+ * @returns {Object} Object with district codes as keys
+ */
+export const groupByDistrict = (geojson) => {
+  if (!geojson || !geojson.features) {
+    return {};
+  }
+
+  const districts = {};
+
+  geojson.features.forEach(feature => {
+    const districtCode = feature.properties.district_code;
+    if (!districts[districtCode]) {
+      districts[districtCode] = {
+        code: districtCode,
+        name: feature.properties.district_name,
+        municipalities: [],
+      };
+    }
+
+    districts[districtCode].municipalities.push({
+      id: feature.properties.id,
+      name: feature.properties.municipality_name,
+      code: feature.properties.municipality_code,
+      value: feature.properties.value,
+    });
+  });
+
+  return districts;
+};
+
+/**
+ * Group municipalities by province from GeoJSON
+ * @param {Object} geojson - GeoJSON FeatureCollection
+ * @returns {Object} Object with province names as keys
+ */
+export const groupByProvince = (geojson) => {
+  if (!geojson || !geojson.features) {
+    return {};
+  }
+
+  const provinces = {};
+
+  geojson.features.forEach(feature => {
+    const province = feature.properties.province;
+    if (!provinces[province]) {
+      provinces[province] = [];
+    }
+
+    provinces[province].push({
+      id: feature.properties.id,
+      name: feature.properties.municipality_name,
+      code: feature.properties.municipality_code,
+      value: feature.properties.value,
+    });
+  });
+
+  return provinces;
+};
+
+/**
  * Calculate statistics for values
  * @param {Array} values - Array of numeric values
  * @returns {Object} Statistics {min, max, mean, median}

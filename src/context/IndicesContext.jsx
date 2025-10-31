@@ -30,13 +30,22 @@ export const IndicesProvider = ({ children }) => {
 
     try {
       const response = await getAllIndices();
+      // API returns {success, count, data: [...]}
       const indicesData = response.data || response;
-      setIndices(indicesData);
+
+      // Normalize: add 'code' property from 'index_code' and 'name' from 'index_name' for compatibility
+      const normalizedIndices = indicesData.map(idx => ({
+        ...idx,
+        code: idx.index_code,
+        name: idx.index_name,
+      }));
+
+      setIndices(normalizedIndices);
 
       // Group by category
-      const precip = indicesData.filter(idx => idx.category === 'precipitation');
-      const temp = indicesData.filter(idx => idx.category === 'temperature');
-      const duration = indicesData.filter(idx => idx.category === 'duration');
+      const precip = normalizedIndices.filter(idx => idx.category === 'precipitation');
+      const temp = normalizedIndices.filter(idx => idx.category === 'temperature');
+      const duration = normalizedIndices.filter(idx => idx.category === 'duration');
 
       setPrecipitationIndices(precip);
       setTemperatureIndices(temp);

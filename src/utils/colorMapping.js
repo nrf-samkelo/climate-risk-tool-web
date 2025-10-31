@@ -11,7 +11,9 @@ export const getColorScale = (indexMetadata, values = []) => {
     return chroma.scale(['#3388ff']).domain([0, 1]);
   }
 
-  const { color_scheme, anomaly_direction } = indexMetadata;
+  // API uses 'risk_direction' field
+  const { color_scheme, risk_direction } = indexMetadata;
+  const direction = risk_direction;
 
   // Calculate min and max from values
   const validValues = values.filter(v => v !== null && v !== undefined && !isNaN(v));
@@ -49,34 +51,28 @@ export const getColorScale = (indexMetadata, values = []) => {
                 '#fddbc7', '#f4a582', '#d6604d', '#b2182b'];
   }
 
-  // Determine domain based on anomaly direction
-  switch (anomaly_direction) {
-    case 'positive_bad':
-      // Positive anomalies are bad (e.g., more drought days, more heat)
+  // Determine domain based on risk_direction from API
+  // API values: 'higher_worse', 'lower_worse', 'neutral'
+  switch (direction) {
+    case 'higher_worse':
+      // Higher values are worse (e.g., more drought days, more heat)
       // Red = high positive (bad), Blue = negative (good)
       domain = [-absMax, 0, absMax];
       colors = ['#2166ac', '#f7f7f7', '#b2182b']; // Blue -> White -> Red
       break;
 
-    case 'positive_good':
-      // Positive anomalies are good (e.g., more precipitation)
-      // Blue = high positive (good), Red = negative (bad)
+    case 'lower_worse':
+      // Lower values are worse (e.g., fewer frost days = warming)
+      // Red = negative (bad/warming), Blue = positive (good/cooling)
       domain = [-absMax, 0, absMax];
       colors = ['#b2182b', '#f7f7f7', '#2166ac']; // Red -> White -> Blue
       break;
 
-    case 'negative_warming':
-      // Negative values indicate warming (e.g., fewer frost days)
-      // Red = negative (warming), Blue = positive (cooling)
+    case 'neutral':
+      // Neutral interpretation
+      // Blue = high positive, Red = negative
       domain = [-absMax, 0, absMax];
       colors = ['#b2182b', '#f7f7f7', '#2166ac']; // Red -> White -> Blue
-      break;
-
-    case 'positive_warming':
-      // Positive values indicate warming (e.g., more hot days)
-      // Red = positive (warming), Blue = negative (cooling)
-      domain = [-absMax, 0, absMax];
-      colors = ['#2166ac', '#f7f7f7', '#b2182b']; // Blue -> White -> Red
       break;
 
     default:
@@ -128,23 +124,20 @@ export const generateLegendItems = (colorScale, steps = 7) => {
 };
 
 /**
- * Get interpretation label based on anomaly direction
- * @param {string} anomalyDirection - Anomaly direction from metadata
- * @returns {Object} Label configuration {positive, negative}
+ * Get interpretation label based on risk_direction from API
+ * @param {string} direction - Risk direction from metadata (API field: 'risk_direction')
+ * @returns {Object} Label configuration {positive, negative, neutral}
  */
-export const getInterpretationLabels = (anomalyDirection) => {
-  switch (anomalyDirection) {
-    case 'positive_bad':
+export const getInterpretationLabels = (direction) => {
+  switch (direction) {
+    case 'higher_worse':
       return { positive: 'Worse', negative: 'Better', neutral: 'No Change' };
 
-    case 'positive_good':
-      return { positive: 'Better', negative: 'Worse', neutral: 'No Change' };
+    case 'lower_worse':
+      return { positive: 'Better/Cooling', negative: 'Worse/Warming', neutral: 'No Change' };
 
-    case 'negative_warming':
-      return { positive: 'Cooling', negative: 'Warming', neutral: 'No Change' };
-
-    case 'positive_warming':
-      return { positive: 'Warming', negative: 'Cooling', neutral: 'No Change' };
+    case 'neutral':
+      return { positive: 'Increase', negative: 'Decrease', neutral: 'No Change' };
 
     default:
       return { positive: 'Increase', negative: 'Decrease', neutral: 'No Change' };
@@ -295,4 +288,83 @@ export const calculateStatistics = (values) => {
   const median = sorted[Math.floor(sorted.length / 2)];
 
   return { min, max, mean, median };
+};
+
+/**
+ * Aggregate climate data at district level with proper statistical calculation
+ * Uses MEAN aggregation for climate anomaly values (appropriate for anomalies)
+ * @param {Object} geojson - GeoJSON FeatureCollection
+ * @returns {Object} District-level aggregated data with statistics
+ */
+export const aggregateByDistrict = (geojson) => {
+  if (!geojson || !geojson.features) {
+    return {};
+  }
+
+  const districts = {};
+
+  geojson.features.forEach(feature => {
+    const props = feature.properties;
+    const districtCode = props.district_code;
+
+    if (!districts[districtCode]) {
+      districts[districtCode] = {
+        code: districtCode,
+        name: props.district_name,
+        municipalities: [],
+        values: [],
+        count: 0,
+        totalArea: 0,
+      };
+    }
+
+    // Collect municipality data
+    districts[districtCode].municipalities.push({
+      id: props.id,
+      name: props.municipality_name,
+      code: props.municipality_code,
+      value: props.value,
+      area: props.area_km2,
+    });
+
+    // Collect values for statistical aggregation
+    if (props.value !== null && props.value !== undefined && !isNaN(props.value)) {
+      districts[districtCode].values.push(props.value);
+    }
+
+    districts[districtCode].count += 1;
+    districts[districtCode].totalArea += props.area_km2 || 0;
+  });
+
+  // Calculate aggregated statistics for each district
+  Object.keys(districts).forEach(code => {
+    const district = districts[code];
+    const stats = calculateStatistics(district.values);
+
+    // For climate anomalies, MEAN is most appropriate
+    // This represents the average anomaly across municipalities in the district
+    district.aggregatedValue = stats.mean;
+    district.min = stats.min;
+    district.max = stats.max;
+    district.median = stats.median;
+    district.stdDev = calculateStdDev(district.values);
+  });
+
+  return districts;
+};
+
+/**
+ * Calculate standard deviation for climate data quality assessment
+ * @param {Array} values - Array of numeric values
+ * @returns {number} Standard deviation
+ */
+const calculateStdDev = (values) => {
+  const validValues = values.filter(v => v !== null && v !== undefined && !isNaN(v));
+
+  if (validValues.length === 0) return 0;
+
+  const mean = validValues.reduce((acc, val) => acc + val, 0) / validValues.length;
+  const variance = validValues.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / validValues.length;
+
+  return Math.sqrt(variance);
 };

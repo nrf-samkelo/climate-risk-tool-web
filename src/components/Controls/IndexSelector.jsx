@@ -18,8 +18,10 @@ const IndexSelector = () => {
     setSelectedCategory(category);
     // Automatically select first index in the new category
     const indicesInCategory = getByCategory(category);
-    if (indicesInCategory.length > 0) {
-      setIndex(indicesInCategory[0].code);
+    // Filter out indices without valid codes
+    const validIndices = indicesInCategory?.filter(idx => idx.code) || [];
+    if (validIndices.length > 0) {
+      setIndex(validIndices[0].code);
     }
   };
 
@@ -29,6 +31,8 @@ const IndexSelector = () => {
 
   const currentIndexMetadata = getIndexByCode(index);
   const indicesInSelectedCategory = getByCategory(selectedCategory);
+  // Filter out any indices without valid codes
+  const validIndices = indicesInSelectedCategory?.filter(idx => idx.code && idx.name) || [];
 
   return (
     <div className="flex flex-col gap-3">
@@ -57,7 +61,7 @@ const IndexSelector = () => {
       {/* Index Dropdown */}
       {loading ? (
         <div className="text-sm text-gray-500 italic">Loading indices...</div>
-      ) : (
+      ) : validIndices.length > 0 ? (
         <>
           <select
             id="index-select"
@@ -65,9 +69,9 @@ const IndexSelector = () => {
             onChange={handleIndexChange}
             className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white text-sm"
           >
-            {indicesInSelectedCategory.map((idx) => (
+            {validIndices.map((idx) => (
               <option key={idx.code} value={idx.code}>
-                {idx.code.toUpperCase()} - {idx.name || idx.description}
+                {idx.code.toUpperCase()} - {idx.name}
               </option>
             ))}
           </select>
@@ -85,6 +89,10 @@ const IndexSelector = () => {
             </div>
           )}
         </>
+      ) : (
+        <div className="text-sm text-red-500 italic">
+          No indices available for this category. Please check API connection.
+        </div>
       )}
     </div>
   );

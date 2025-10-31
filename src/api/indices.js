@@ -2,7 +2,8 @@ import apiClient from './client';
 
 /**
  * Get all climate indices (27 total) with metadata
- * Includes color_scheme, anomaly_direction, unit, interpretation
+ * Includes: index_code, index_name, category, description, unit,
+ * interpretation, risk_direction, color_scheme, baseline_period
  * @returns {Promise} Array of all climate indices
  */
 export const getAllIndices = async () => {

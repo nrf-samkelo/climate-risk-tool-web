@@ -11,7 +11,7 @@ import {
 
 /**
  * Legend - Dynamic color scale legend
- * Uses API response metadata (color_scheme, anomaly_direction, interpretation)
+ * Uses API response metadata (color_scheme, risk_direction, interpretation)
  * Uses colorMapping utilities for scale generation
  */
 const Legend = () => {
@@ -46,10 +46,10 @@ const Legend = () => {
     return generateLegendItems(colorScale, 7);
   }, [colorScale]);
 
-  // Get interpretation labels based on anomaly_direction from API
+  // Get interpretation labels based on risk_direction from API
   const interpretationLabels = useMemo(() => {
-    if (!indexMetadata?.anomaly_direction) return null;
-    return getInterpretationLabels(indexMetadata.anomaly_direction);
+    if (!indexMetadata?.risk_direction) return null;
+    return getInterpretationLabels(indexMetadata.risk_direction);
   }, [indexMetadata]);
 
   if (!indexMetadata || !colorScale || legendItems.length === 0) {
@@ -90,7 +90,7 @@ const Legend = () => {
         </div>
       </div>
 
-      {/* Interpretation Labels (from anomaly_direction) */}
+      {/* Interpretation Labels (from risk_direction) */}
       {interpretationLabels && (
         <div className="mb-3 pt-3 border-t border-gray-200">
           <p className="text-xs text-gray-600 mb-1 font-semibold">
@@ -154,7 +154,7 @@ const Legend = () => {
           Color Scheme: <span className="font-mono">{indexMetadata.color_scheme}</span>
         </p>
         <p className="text-xs text-gray-500">
-          Direction: <span className="font-mono">{indexMetadata.anomaly_direction}</span>
+          Risk Direction: <span className="font-mono">{indexMetadata.risk_direction}</span>
         </p>
       </div>
     </div>

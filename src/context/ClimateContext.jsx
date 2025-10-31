@@ -7,7 +7,17 @@ export const ClimateProvider = ({ children }) => {
   // Map configuration state
   const [scenario, setScenario] = useState('ssp245');
   const [period, setPeriod] = useState('near-term_2021-2040');
-  const [index, setIndex] = useState('cdd');
+  const [index, setIndexState] = useState('cdd');
+
+  // Wrapper to validate index before setting
+  const setIndex = useCallback((newIndex) => {
+    // Only allow setting if it's a valid code (short string without spaces or special chars)
+    if (typeof newIndex === 'string' && newIndex.length > 0 && newIndex.length < 20 && !newIndex.includes(' ')) {
+      setIndexState(newIndex);
+    } else {
+      console.warn('Invalid index code rejected:', newIndex);
+    }
+  }, []);
 
   // Data state
   const [geojsonData, setGeojsonData] = useState(null);

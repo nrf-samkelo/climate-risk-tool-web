@@ -5,15 +5,20 @@ import 'leaflet/dist/leaflet.css';
 import styles from './Map.module.css';
 
 /**
- * Component to fit map to South Africa bounds
+ * Component to fit map to South Africa bounds and expose map instance
  */
-function MapBoundsController() {
+function MapBoundsController({ onMapReady }) {
   const map = useMap();
 
   useEffect(() => {
     // Fit map to South Africa bounds
     map.fitBounds(SA_BOUNDS);
-  }, [map]);
+
+    // Expose map instance to parent
+    if (onMapReady) {
+      onMapReady(map);
+    }
+  }, [map, onMapReady]);
 
   return null;
 }
@@ -21,7 +26,7 @@ function MapBoundsController() {
 /**
  * Main Map Component
  */
-const Map = ({ children }) => {
+const Map = ({ children, onMapReady }) => {
   const mapRef = useRef(null);
 
   return (
@@ -44,7 +49,7 @@ const Map = ({ children }) => {
         />
 
         {/* Fit map to South Africa bounds */}
-        <MapBoundsController />
+        <MapBoundsController onMapReady={onMapReady} />
 
         {/* Children components (ClimateLayer, Legend, etc.) */}
         {children}

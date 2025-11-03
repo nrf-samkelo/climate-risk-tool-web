@@ -14,10 +14,11 @@ const PeriodSelector = () => {
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-1.5">
       <label
         htmlFor="period-select"
-        className="text-sm font-semibold text-gray-700"
+        className="text-xs font-medium"
+        style={{ color: '#475569' }}
       >
         Time Period
       </label>
@@ -25,7 +26,7 @@ const PeriodSelector = () => {
         id="period-select"
         value={period}
         onChange={handleChange}
-        className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white text-sm"
+        className="nice-select"
       >
         {PERIODS.map((option) => (
           <option key={option.value} value={option.value}>
@@ -34,7 +35,7 @@ const PeriodSelector = () => {
         ))}
       </select>
       {/* Show start-end years for selected period */}
-      <p className="text-xs text-gray-500 italic">
+      <p className="text-[10px] italic" style={{ color: '#64748b' }}>
         {PERIODS.find(p => p.value === period)?.start} - {PERIODS.find(p => p.value === period)?.end}
       </p>
     </div>

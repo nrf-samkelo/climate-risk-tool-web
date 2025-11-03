@@ -1,13 +1,13 @@
 // API Configuration
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
-// Map Configuration
+// Map Configuration (matching risk-profiler-web defaults)
 export const MAP_CONFIG = {
   center: [
-    parseFloat(import.meta.env.VITE_MAP_CENTER_LAT) || -29.0,
-    parseFloat(import.meta.env.VITE_MAP_CENTER_LNG) || 25.0
+    parseFloat(import.meta.env.VITE_MAP_CENTER_LAT) || -28.75,
+    parseFloat(import.meta.env.VITE_MAP_CENTER_LNG) || 22.9
   ],
-  zoom: parseInt(import.meta.env.VITE_MAP_ZOOM) || 6,
+  zoom: parseFloat(import.meta.env.VITE_MAP_ZOOM) || 4.7,
   minZoom: parseInt(import.meta.env.VITE_MAP_MIN_ZOOM) || 5,
   maxZoom: parseInt(import.meta.env.VITE_MAP_MAX_ZOOM) || 12,
 };

@@ -12,7 +12,7 @@ import 'leaflet/dist/leaflet.css';
  * ComparisonView - Side-by-side scenario comparison
  * Uses ClimateContext for comparisonMode and comparisonScenario
  * Leverages existing Map, ClimateLayer, Legend components
- * Synchronizes period, index, and viewMode between both maps
+ * Synchronizes period and index between both maps
  */
 const ComparisonView = () => {
   const {

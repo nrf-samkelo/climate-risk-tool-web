@@ -51,8 +51,7 @@ climate-risk-tool-web/
 │   │   │   ├── ScenarioSelector.jsx
 │   │   │   ├── PeriodSelector.jsx
 │   │   │   ├── IndexSelector.jsx
-│   │   │   ├── DistrictView.jsx
-│   │   │   ├── TimeSeriesPlayer.jsx
+│   │   │   ├── MunicipalitySearch.jsx
 │   │   │   └── ComparisonToggle.jsx
 │   │   ├── Legend/                     # Legend component
 │   │   │   └── Legend.jsx
@@ -89,9 +88,8 @@ climate-risk-tool-web/
 - ✅ Dynamic legend with statistics
 
 ### Advanced Features
-- ✅ **District-level aggregation** with proper statistical methods (MEAN, Std Dev)
-- ✅ **Time series animation** with play/pause controls and speed adjustment
 - ✅ **Side-by-side scenario comparison** for scenario analysis
+- ✅ **Municipality search** with auto-zoom functionality
 - ✅ Synchronized period and index across comparison views
 - ✅ Category-based index filtering (Precipitation, Temperature, Duration)
 
@@ -129,21 +127,10 @@ GET /api/municipalities
 GET /api/climate-data/scenarios
 GET /api/climate-data/periods
 
-// District Aggregation
-GET /api/climate-data/district/{districtCode}/{scenario}/{period}
-
 // Cache Management
 GET /api/cache/stats
 POST /api/cache/clear
 ```
-
-## 🧮 Statistical Methods
-
-### District Aggregation
-- **Method**: MEAN aggregation (appropriate for climate anomalies)
-- **Formula**: `district_anomaly = Σ(municipality_anomalies) / count`
-- **Metrics**: Mean, Standard Deviation, Min, Max, Median
-- **Quality**: Standard deviation shows spatial variability within districts
 
 ## 🎨 Color Mapping
 
@@ -189,7 +176,7 @@ VITE_MAP_MAX_ZOOM=12
 
 - [ ] Map export to PNG/PDF
 - [ ] Provincial-level aggregation
-- [ ] Advanced filtering (by province, district)
+- [ ] Advanced filtering (by province)
 - [ ] Data download (CSV, JSON)
 - [ ] Mobile-optimized layout
 - [ ] Accessibility improvements (ARIA labels, keyboard navigation)

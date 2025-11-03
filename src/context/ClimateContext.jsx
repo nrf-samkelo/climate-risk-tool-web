@@ -27,9 +27,6 @@ export const ClimateProvider = ({ children }) => {
   // Selected municipality for info panel
   const [selectedMunicipality, setSelectedMunicipality] = useState(null);
 
-  // View mode: 'municipality' or 'district'
-  const [viewMode, setViewMode] = useState('municipality');
-
   // Comparison mode (for side-by-side comparison)
   const [comparisonMode, setComparisonMode] = useState(false);
   const [comparisonScenario, setComparisonScenario] = useState('ssp585');
@@ -92,10 +89,6 @@ export const ClimateProvider = ({ children }) => {
     // Selected municipality
     selectedMunicipality,
     setSelectedMunicipality,
-
-    // View mode
-    viewMode,
-    setViewMode,
 
     // Comparison mode
     comparisonMode,

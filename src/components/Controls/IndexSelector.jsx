@@ -35,39 +35,40 @@ const IndexSelector = () => {
   const validIndices = indicesInSelectedCategory?.filter(idx => idx.code && idx.name) || [];
 
   return (
-    <div className="flex flex-col gap-3">
-      <label className="text-sm font-semibold text-gray-700">
+    <div className="flex flex-col gap-2">
+      <label className="text-xs font-medium" style={{ color: '#475569' }}>
         Climate Index
       </label>
 
       {/* Category Tabs */}
-      <div className="flex gap-2">
+      <div className="flex gap-1.5">
         {CATEGORIES.map((category) => (
           <button
             key={category.value}
             onClick={() => handleCategoryChange(category.value)}
-            className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex-1 px-2 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
               selectedCategory === category.value
-                ? 'bg-primary-500 text-white shadow-sm'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'text-white shadow-sm'
+                : 'text-gray-700 hover:bg-gray-100'
             }`}
+            style={selectedCategory === category.value ? { background: '#60a5fa' } : { background: '#f1f5f9' }}
           >
             <span className="mr-1">{category.icon}</span>
-            {category.label}
+            <span className="hidden sm:inline">{category.label}</span>
           </button>
         ))}
       </div>
 
       {/* Index Dropdown */}
       {loading ? (
-        <div className="text-sm text-gray-500 italic">Loading indices...</div>
+        <div className="text-[10px] italic" style={{ color: '#64748b' }}>Loading indices...</div>
       ) : validIndices.length > 0 ? (
         <>
           <select
             id="index-select"
             value={index}
             onChange={handleIndexChange}
-            className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white text-sm"
+            className="nice-select"
           >
             {validIndices.map((idx) => (
               <option key={idx.code} value={idx.code}>
@@ -78,19 +79,16 @@ const IndexSelector = () => {
 
           {/* Show description and unit for selected index */}
           {currentIndexMetadata && (
-            <div className="text-xs text-gray-600 space-y-1">
+            <div className="text-[10px] space-y-0.5" style={{ color: '#64748b' }}>
               <p className="italic">{currentIndexMetadata.interpretation}</p>
               <p>
                 <span className="font-semibold">Unit:</span> {currentIndexMetadata.unit}
-              </p>
-              <p>
-                <span className="font-semibold">Color Scheme:</span> {currentIndexMetadata.color_scheme}
               </p>
             </div>
           )}
         </>
       ) : (
-        <div className="text-sm text-red-500 italic">
+        <div className="text-[10px] italic" style={{ color: '#dc2626' }}>
           No indices available for this category. Please check API connection.
         </div>
       )}

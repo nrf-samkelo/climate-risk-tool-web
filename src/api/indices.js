@@ -48,3 +48,32 @@ export const getIndicesSummary = async () => {
   const response = await apiClient.get('/api/indices/stats/summary');
   return response.data;
 };
+
+/**
+ * 🆕 Get sector abbreviation reference
+ * Returns full names and descriptions for AFS, H, WRH, All
+ * @returns {Promise} Sector reference with explanations
+ */
+export const getSectors = async () => {
+  const response = await apiClient.get('/api/indices/sectors');
+  return response.data;
+};
+
+/**
+ * 🆕 Get color scheme reference and explanation
+ * Explains color_palette_type vs color_scheme relationship
+ * @returns {Promise} Color scheme documentation
+ */
+export const getColorSchemes = async () => {
+  const response = await apiClient.get('/api/indices/color-schemes');
+  return response.data;
+};
+
+/**
+ * 🆕 Get indices grouped by sector
+ * @returns {Promise} Indices organized by sector relevance
+ */
+export const getIndicesBySector = async () => {
+  const response = await apiClient.get('/api/indices/stats/by-sector');
+  return response.data;
+};

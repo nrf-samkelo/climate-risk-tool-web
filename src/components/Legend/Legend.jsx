@@ -8,11 +8,13 @@ import {
   getInterpretationLabels,
   calculateStatistics,
 } from '../../utils/colorMapping';
+import SectorTags from '../Common/SectorTags';
 
 /**
- * Legend - Dynamic color scale legend
- * Uses API response metadata (color_scheme, risk_direction, interpretation)
- * Uses colorMapping utilities for scale generation
+ * Legend - Dynamic color scale legend with enhanced metadata display
+ * Uses API response metadata (color_scheme, anomaly_direction, plain_language_description)
+ * Shows plain language descriptions for accessibility
+ * Displays sector relevance tags
  */
 const Legend = () => {
   const { geojsonData, index } = useClimate();
@@ -46,10 +48,10 @@ const Legend = () => {
     return generateLegendItems(colorScale, 7);
   }, [colorScale]);
 
-  // Get interpretation labels based on risk_direction from API
+  // Get interpretation labels based on anomaly_direction from API
   const interpretationLabels = useMemo(() => {
-    if (!indexMetadata?.risk_direction) return null;
-    return getInterpretationLabels(indexMetadata.risk_direction);
+    if (!indexMetadata?.anomaly_direction) return null;
+    return getInterpretationLabels(indexMetadata.anomaly_direction);
   }, [indexMetadata]);
 
   if (!indexMetadata || !colorScale || legendItems.length === 0) {
@@ -63,10 +65,34 @@ const Legend = () => {
         <h3 className="text-xs font-semibold text-gray-700">
           {indexMetadata.code?.toUpperCase()} - {indexMetadata.name}
         </h3>
+
+        {/* Plain Language Description */}
+        {indexMetadata.plain_language_description && (
+          <div className="mt-1.5 bg-blue-50 rounded p-1.5">
+            <div className="flex items-start gap-1">
+              <span className="text-[10px]">💡</span>
+              <p className="text-[10px] font-medium" style={{ color: '#1e40af' }}>
+                {indexMetadata.plain_language_description}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Unit */}
         {indexMetadata.unit && (
-          <p className="text-[11px] text-gray-500 mt-0.5">
+          <p className="text-[11px] text-gray-500 mt-1">
             Unit: {indexMetadata.unit}
           </p>
+        )}
+
+        {/* Sector Tags */}
+        {indexMetadata.sector && (
+          <div className="mt-1.5 pt-1.5 border-t border-gray-100">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[9px] font-semibold text-gray-600">Sectors:</span>
+              <SectorTags sectorString={indexMetadata.sector} size="sm" />
+            </div>
+          </div>
         )}
       </div>
 

@@ -1,15 +1,19 @@
+import { useState } from 'react';
 import { useClimate } from '../../context/ClimateContext';
 import { useIndices } from '../../context/IndicesContext';
 import { formatScenario, formatPeriod } from '../../utils/constants';
+import SectorTags from '../Common/SectorTags';
 
 /**
- * InfoPanel - Displays selected municipality details
+ * InfoPanel - Displays selected municipality details with enhanced index information
  * Uses ClimateContext for selected municipality data
- * Leverages all API response properties from GeoJSON
+ * Shows plain language descriptions and optional technical definitions
+ * Displays sector relevance tags
  */
 const InfoPanel = () => {
   const { selectedMunicipality, setSelectedMunicipality } = useClimate();
   const { getIndexByCode } = useIndices();
+  const [showTechnical, setShowTechnical] = useState(false);
 
   if (!selectedMunicipality) {
     return null;
@@ -100,6 +104,59 @@ const InfoPanel = () => {
             <InfoRow label="Unit" value={indexMetadata.unit} />
           )}
         </div>
+
+        {/* Index Information - Plain Language & Technical */}
+        {indexMetadata && (
+          <div className="pb-2 border-b border-gray-200">
+            <h4 className="text-xs font-semibold text-gray-700 mb-1">
+              {indexMetadata.name || indexMetadata.index_name}
+            </h4>
+
+            {/* Plain Language Description */}
+            {indexMetadata.plain_language_description && (
+              <div className="bg-blue-50 rounded p-2 mb-1.5">
+                <div className="flex items-start gap-1.5">
+                  <span className="text-sm">💡</span>
+                  <p className="text-[10px] font-medium" style={{ color: '#1e40af' }}>
+                    {indexMetadata.plain_language_description}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Technical Definition Toggle */}
+            {indexMetadata.technical_definition && (
+              <div className="mt-1.5">
+                <button
+                  onClick={() => setShowTechnical(!showTechnical)}
+                  className="text-[10px] text-blue-600 hover:text-blue-800 font-medium underline"
+                >
+                  {showTechnical ? '▼ Hide' : '▶ Show'} Technical Definition
+                </button>
+
+                {showTechnical && (
+                  <div className="mt-1 bg-gray-50 rounded p-2 border border-gray-200">
+                    <p className="text-[10px] text-gray-700 leading-relaxed">
+                      {indexMetadata.technical_definition}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Sector Tags */}
+            {indexMetadata.sector && (
+              <div className="mt-2 pt-2 border-t border-gray-100">
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] font-semibold text-gray-600">
+                    Relevant Sectors:
+                  </span>
+                  <SectorTags sectorString={indexMetadata.sector} size="sm" />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Climate Value - Highlighted */}
         <div className="bg-primary-50 rounded-lg p-2">

@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { getAllIndices, getIndicesByCategory } from '../api/indices';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { getAllIndices, getSectors } from '../api/indices';
+import { parseSectors } from '../utils/sectors';
 
 const IndicesContext = createContext(null);
 
@@ -9,10 +10,33 @@ export const IndicesProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Sector reference data (AFS, H, WRH, All)
+  const [sectors, setSectors] = useState([]);
+  const [sectorsLoading, setSectorsLoading] = useState(false);
+
   // Grouped by category
   const [precipitationIndices, setPrecipitationIndices] = useState([]);
   const [temperatureIndices, setTemperatureIndices] = useState([]);
   const [durationIndices, setDurationIndices] = useState([]);
+
+  /**
+   * Fetch sectors reference on mount
+   */
+  useEffect(() => {
+    const fetchSectorsData = async () => {
+      setSectorsLoading(true);
+      try {
+        const response = await getSectors();
+        setSectors(response.sectors || []);
+      } catch (err) {
+        console.error('Error fetching sectors:', err);
+      } finally {
+        setSectorsLoading(false);
+      }
+    };
+
+    fetchSectorsData();
+  }, []);
 
   /**
    * Fetch all climate indices on mount
@@ -33,11 +57,14 @@ export const IndicesProvider = ({ children }) => {
       // API returns {success, count, data: [...]}
       const indicesData = response.data || response;
 
-      // Normalize: add 'code' property from 'index_code' and 'name' from 'index_name' for compatibility
+      // Normalize and enrich indices with:
+      // 1. Legacy 'code' and 'name' fields for compatibility
+      // 2. Parsed sectors array for easier rendering
       const normalizedIndices = indicesData.map(idx => ({
         ...idx,
         code: idx.index_code,
         name: idx.index_name,
+        parsedSectors: parseSectors(idx.sector), // Enrich with sector objects
       }));
 
       setIndices(normalizedIndices);
@@ -82,11 +109,15 @@ export const IndicesProvider = ({ children }) => {
   }, [precipitationIndices, temperatureIndices, durationIndices]);
 
   const value = {
-    // All indices
+    // All indices (with new fields: technical_definition, plain_language_description, sector, etc.)
     indices,
     loading,
     error,
     fetchAllIndices,
+
+    // Sector reference data
+    sectors,
+    sectorsLoading,
 
     // Grouped indices
     precipitationIndices,

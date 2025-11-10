@@ -1,7 +1,26 @@
 import chroma from 'chroma-js';
 
 /**
+ * ColorBrewer palette definitions
+ * Based on SAEON authoritative guidance for climate anomaly visualization
+ *
+ * These are the SPECIFIC color palettes defined by ColorBrewer.
+ * The API's color_scheme field tells us which one to use.
+ */
+const COLOR_SCHEMES = {
+  'RdBu_r': ['#2166ac', '#f7f7f7', '#b2182b'], // Blue → White → Red (for heat/drought)
+  'BuRd':   ['#b2182b', '#f7f7f7', '#2166ac'], // Red → White → Blue (for precipitation)
+  'RdBu':   ['#2166ac', '#f7f7f7', '#b2182b'], // Blue → White → Red (for cold indices)
+};
+
+/**
  * Generate color scale based on climate index metadata
+ *
+ * Uses THREE API fields correctly:
+ * 1. color_palette_type: HOW to apply (e.g., "diverging" = center at zero)
+ * 2. color_scheme: WHICH colors to use (e.g., "RdBu_r" = specific palette)
+ * 3. anomaly_direction: What colors MEAN (for labels only, NOT for modifying colors)
+ *
  * @param {Object} indexMetadata - Climate index metadata from API
  * @param {Array} values - Array of climate values for the index
  * @returns {Function} Chroma color scale function
@@ -11,9 +30,8 @@ export const getColorScale = (indexMetadata, values = []) => {
     return chroma.scale(['#3388ff']).domain([0, 1]);
   }
 
-  // API uses 'risk_direction' field
-  const { color_scheme, risk_direction } = indexMetadata;
-  const direction = risk_direction;
+  // Extract the three color-related fields from API
+  const { color_palette_type, color_scheme, anomaly_direction } = indexMetadata;
 
   // Calculate min and max from values
   const validValues = values.filter(v => v !== null && v !== undefined && !isNaN(v));
@@ -23,66 +41,23 @@ export const getColorScale = (indexMetadata, values = []) => {
   // Get absolute max for symmetric diverging scales
   const absMax = Math.max(Math.abs(min), Math.abs(max));
 
-  // Map color schemes to Chroma.js color arrays
-  let colors;
-  let domain;
+  // Step 1: Check color_palette_type to know HOW to apply colors
+  if (color_palette_type === 'diverging') {
+    // Step 2: Use color_scheme to know WHICH specific colors to use
+    // The backend has already chosen the appropriate scheme for this index
+    const colors = COLOR_SCHEMES[color_scheme] || COLOR_SCHEMES['RdBu_r'];
 
-  switch (color_scheme) {
-    case 'RdBu_r':
-      // Red-Blue reversed (Red for high, Blue for low)
-      colors = ['#2166ac', '#4393c3', '#92c5de', '#d1e5f0', '#f7f7f7',
-                '#fddbc7', '#f4a582', '#d6604d', '#b2182b'];
-      break;
+    // Step 3: Create diverging scale with symmetric domain centered at zero
+    const domain = [-absMax, 0, absMax];
 
-    case 'BuRd':
-      // Blue-Red (Blue for high, Red for low)
-      colors = ['#b2182b', '#d6604d', '#f4a582', '#fddbc7', '#f7f7f7',
-                '#d1e5f0', '#92c5de', '#4393c3', '#2166ac'];
-      break;
+    // Step 4: anomaly_direction is NOT used here!
+    // It's only for interpretation (labels/tooltips) - see getInterpretationLabels()
 
-    case 'RdBu':
-      // Red-Blue (Red for low, Blue for high)
-      colors = ['#b2182b', '#d6604d', '#f4a582', '#fddbc7', '#f7f7f7',
-                '#d1e5f0', '#92c5de', '#4393c3', '#2166ac'];
-      break;
-
-    default:
-      colors = ['#2166ac', '#4393c3', '#92c5de', '#d1e5f0', '#f7f7f7',
-                '#fddbc7', '#f4a582', '#d6604d', '#b2182b'];
+    return chroma.scale(colors).domain(domain).mode('lab');
   }
 
-  // Determine domain based on risk_direction from API
-  // API values: 'higher_worse', 'lower_worse', 'neutral'
-  switch (direction) {
-    case 'higher_worse':
-      // Higher values are worse (e.g., more drought days, more heat)
-      // Red = high positive (bad), Blue = negative (good)
-      domain = [-absMax, 0, absMax];
-      colors = ['#2166ac', '#f7f7f7', '#b2182b']; // Blue -> White -> Red
-      break;
-
-    case 'lower_worse':
-      // Lower values are worse (e.g., fewer frost days = warming)
-      // Red = negative (bad/warming), Blue = positive (good/cooling)
-      domain = [-absMax, 0, absMax];
-      colors = ['#b2182b', '#f7f7f7', '#2166ac']; // Red -> White -> Blue
-      break;
-
-    case 'neutral':
-      // Neutral interpretation
-      // Blue = high positive, Red = negative
-      domain = [-absMax, 0, absMax];
-      colors = ['#b2182b', '#f7f7f7', '#2166ac']; // Red -> White -> Blue
-      break;
-
-    default:
-      // Default diverging scale
-      domain = [-absMax, 0, absMax];
-      colors = ['#2166ac', '#f7f7f7', '#b2182b'];
-  }
-
-  // Create and return Chroma scale
-  return chroma.scale(colors).domain(domain).mode('lab');
+  // Fallback for non-diverging scales (currently all indices use diverging)
+  return chroma.scale(['#2166ac', '#f7f7f7', '#b2182b']).domain([-absMax, 0, absMax]).mode('lab');
 };
 
 /**
@@ -124,19 +99,34 @@ export const generateLegendItems = (colorScale, steps = 7) => {
 };
 
 /**
- * Get interpretation label based on risk_direction from API
- * @param {string} direction - Risk direction from metadata (API field: 'risk_direction')
+ * Get interpretation labels based on anomaly_direction from API
+ *
+ * This is where anomaly_direction is USED - for creating meaningful labels!
+ * NOT for modifying the color scale itself.
+ *
+ * @param {string} direction - Anomaly direction from metadata (API field: 'anomaly_direction')
  * @returns {Object} Label configuration {positive, negative, neutral}
  */
 export const getInterpretationLabels = (direction) => {
   switch (direction) {
-    case 'higher_worse':
+    case 'positive_bad':
+      // Positive anomalies = worse (e.g., CDD, TXge30 - more heat/drought)
       return { positive: 'Worse', negative: 'Better', neutral: 'No Change' };
 
-    case 'lower_worse':
-      return { positive: 'Better/Cooling', negative: 'Worse/Warming', neutral: 'No Change' };
+    case 'positive_good':
+      // Positive anomalies = better (e.g., PRCPTOT - more rainfall)
+      return { positive: 'Better', negative: 'Worse', neutral: 'No Change' };
+
+    case 'negative_warming':
+      // Negative anomalies = warming (e.g., FD - fewer frost days)
+      return { positive: 'Cooling', negative: 'Warming', neutral: 'No Change' };
+
+    case 'positive_warming':
+      // Positive anomalies = warming (e.g., TNN - warmer coldest nights)
+      return { positive: 'Warming', negative: 'Cooling', neutral: 'No Change' };
 
     case 'neutral':
+      // Neither clearly good nor bad
       return { positive: 'Increase', negative: 'Decrease', neutral: 'No Change' };
 
     default:

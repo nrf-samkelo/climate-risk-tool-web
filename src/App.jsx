@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { ClimateProvider, useClimate } from './context/ClimateContext';
 import { IndicesProvider } from './context/IndicesContext';
 import { SA_BOUNDS } from './utils/constants';
@@ -22,14 +22,50 @@ import MunicipalitySearch from './components/Controls/MunicipalitySearch';
 function AppContent() {
   const { comparisonMode, fetchClimateData, scenario, period, index } = useClimate();
   const [mapInstance, setMapInstance] = useState(null);
+  const [comparisonMaps, setComparisonMaps] = useState(null);
 
   // Fetch initial climate data on mount and when config changes
   useEffect(() => {
     fetchClimateData();
   }, [scenario, period, index, fetchClimateData]);
 
+  // Callback to receive comparison map instances
+  const handleComparisonMapsReady = useCallback((maps) => {
+    setComparisonMaps(maps);
+  }, []);
+
   // Handle municipality selection - zoom to municipality
   const handleMunicipalitySelect = (municipality) => {
+    // In comparison mode, zoom both maps
+    if (comparisonMode && comparisonMaps) {
+      const { mapA, mapB } = comparisonMaps;
+
+      // If no municipality (cleared search), zoom back to SA bounds
+      if (!municipality) {
+        mapA.fitBounds(SA_BOUNDS, { duration: 0.6 });
+        mapB.fitBounds(SA_BOUNDS, { duration: 0.6 });
+        return;
+      }
+
+      // Zoom to municipality bounds
+      if (municipality.bbox) {
+        const [[minx, miny], [maxx, maxy]] = [
+          [municipality.bbox[0], municipality.bbox[1]],
+          [municipality.bbox[2], municipality.bbox[3]],
+        ];
+
+        const bounds = [
+          [miny, minx],
+          [maxy, maxx],
+        ];
+
+        mapA.fitBounds(bounds, { padding: [32, 32], duration: 0.6 });
+        mapB.fitBounds(bounds, { padding: [32, 32], duration: 0.6 });
+      }
+      return;
+    }
+
+    // In single view mode, zoom single map
     if (!mapInstance) return;
 
     // If no municipality (cleared search), zoom back to SA bounds
@@ -106,7 +142,7 @@ function AppContent() {
         {/* Map Container */}
         <main className="flex-1 relative">
           {comparisonMode ? (
-            <ComparisonView />
+            <ComparisonView onMapsReady={handleComparisonMapsReady} />
           ) : (
             <>
               <Map onMapReady={setMapInstance}>

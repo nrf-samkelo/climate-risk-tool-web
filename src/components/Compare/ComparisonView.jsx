@@ -21,7 +21,7 @@ import 'leaflet/dist/leaflet.css';
  * Leverages existing Map, ClimateLayer, Legend components
  * Synchronizes period and index between both maps
  */
-const ComparisonView = () => {
+const ComparisonView = ({ onMapsReady }) => {
   const {
     scenario,
     period,
@@ -40,6 +40,13 @@ const ComparisonView = () => {
 
   // Selected municipality for comparison
   const [selectedMunicipality, setSelectedMunicipality] = useState(null);
+
+  // Notify parent when both maps are ready
+  useEffect(() => {
+    if (mapA && mapB && onMapsReady) {
+      onMapsReady({ mapA, mapB });
+    }
+  }, [mapA, mapB, onMapsReady]);
 
   // Fetch GeoJSON for both scenarios
   const [geojsonA, setGeojsonA] = useState(null);

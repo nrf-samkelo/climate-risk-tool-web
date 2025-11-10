@@ -29,7 +29,7 @@ const ComparisonToggle = () => {
   return (
     <div className="flex flex-col gap-2">
       <label className="text-sm font-semibold text-gray-700">
-        Scenario Comparison
+        Comparison Mode
       </label>
 
       <button
@@ -48,20 +48,20 @@ const ComparisonToggle = () => {
             viewBox="0 0 24 24"
           >
             {comparisonMode ? (
-              // Split view icon
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 4v16m6-16v16M3 8h18M3 16h18"
-              />
-            ) : (
-              // Single view icon
+              // Single view icon (to exit)
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
                 d="M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z"
+              />
+            ) : (
+              // Split view icon (to enter)
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 4v16m6-16v16M3 8h18M3 16h18"
               />
             )}
           </svg>
@@ -73,14 +73,18 @@ const ComparisonToggle = () => {
 
       {comparisonMode && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-xs text-blue-800">
-          <p className="font-semibold mb-1">Comparison Mode Active</p>
-          <p>
-            Comparing <span className="font-mono font-bold">{scenario}</span> with{' '}
-            <span className="font-mono font-bold">{comparisonScenario}</span>
-          </p>
-          <p className="mt-1 text-blue-600 italic">
-            Period and index are synchronized between both maps
-          </p>
+          <div className="flex items-center gap-1">
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span className="font-medium">
+              Period &amp; Index synchronized
+            </span>
+          </div>
         </div>
       )}
     </div>

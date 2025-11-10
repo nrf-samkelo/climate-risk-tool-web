@@ -93,7 +93,7 @@ const InfoPanel = () => {
           </h4>
           <InfoRow
             label="Scenario"
-            value={scenarioInfo.label}
+            value={scenarioInfo.fullLabel}
           />
           <InfoRow label="Period" value={periodInfo.label} />
           <InfoRow

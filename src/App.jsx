@@ -12,6 +12,7 @@ import ScenarioSelector from './components/Controls/ScenarioSelector';
 import PeriodSelector from './components/Controls/PeriodSelector';
 import IndexSelector from './components/Controls/IndexSelector';
 import ComparisonToggle from './components/Controls/ComparisonToggle';
+import ComparisonScenarioSelector from './components/Controls/ComparisonScenarioSelector';
 import ComparisonView from './components/Compare/ComparisonView';
 import MunicipalitySearch from './components/Controls/MunicipalitySearch';
 
@@ -80,24 +81,27 @@ function AppContent() {
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Sidebar - Controls */}
-        {!comparisonMode && (
-          <aside className="w-72 bg-white border-r border-gray-200 overflow-y-auto p-3 space-y-3">
-            <MunicipalitySearch onSelect={handleMunicipalitySelect} />
+        {/* Sidebar - Controls (Always visible, adapts to comparison mode) */}
+        <aside className="w-72 bg-white border-r border-gray-200 overflow-y-auto p-3 space-y-3">
+          <MunicipalitySearch onSelect={handleMunicipalitySelect} />
+          <div className="border-t border-gray-200 pt-3">
+            <ScenarioSelector />
+          </div>
+          {comparisonMode && (
             <div className="border-t border-gray-200 pt-3">
-              <ScenarioSelector />
+              <ComparisonScenarioSelector />
             </div>
-            <div className="border-t border-gray-200 pt-3">
-              <PeriodSelector />
-            </div>
-            <div className="border-t border-gray-200 pt-3">
-              <IndexSelector />
-            </div>
-            <div className="border-t border-gray-200 pt-3">
-              <ComparisonToggle />
-            </div>
-          </aside>
-        )}
+          )}
+          <div className="border-t border-gray-200 pt-3">
+            <PeriodSelector />
+          </div>
+          <div className="border-t border-gray-200 pt-3">
+            <IndexSelector />
+          </div>
+          <div className="border-t border-gray-200 pt-3">
+            <ComparisonToggle />
+          </div>
+        </aside>
 
         {/* Map Container */}
         <main className="flex-1 relative">

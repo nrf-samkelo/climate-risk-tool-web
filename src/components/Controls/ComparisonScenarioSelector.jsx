@@ -2,29 +2,28 @@ import { useClimate } from '../../context/ClimateContext';
 import { SCENARIOS } from '../../utils/constants';
 
 /**
- * ScenarioSelector - Dropdown to select SSP scenario
- * Uses ClimateContext for state management
- * Uses SCENARIOS constant (can be enhanced to fetch from API)
+ * ComparisonScenarioSelector - Scenario B selector for comparison mode
+ * Only visible when comparison mode is active
  */
-const ScenarioSelector = () => {
-  const { scenario, setScenario, comparisonMode } = useClimate();
+const ComparisonScenarioSelector = () => {
+  const { comparisonScenario, setComparisonScenario } = useClimate();
 
   const handleChange = (e) => {
-    setScenario(e.target.value);
+    setComparisonScenario(e.target.value);
   };
 
   return (
     <div className="flex flex-col gap-1.5">
       <label
-        htmlFor="scenario-select"
+        htmlFor="comparison-scenario-select"
         className="text-xs font-medium"
         style={{ color: '#475569' }}
       >
-        {comparisonMode ? 'Scenario A (Main)' : 'Emission Scenario'}
+        Scenario B (Comparison)
       </label>
       <select
-        id="scenario-select"
-        value={scenario}
+        id="comparison-scenario-select"
+        value={comparisonScenario}
         onChange={handleChange}
         className="nice-select"
       >
@@ -36,10 +35,10 @@ const ScenarioSelector = () => {
       </select>
       {/* Show description for selected scenario */}
       <p className="text-[10px] italic" style={{ color: '#64748b' }}>
-        {SCENARIOS.find(s => s.value === scenario)?.description}
+        {SCENARIOS.find(s => s.value === comparisonScenario)?.description}
       </p>
     </div>
   );
 };
 
-export default ScenarioSelector;
+export default ComparisonScenarioSelector;

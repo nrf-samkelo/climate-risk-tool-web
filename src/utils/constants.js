@@ -55,12 +55,37 @@ export const PERIODS = [
  */
 export const formatScenario = (scenario) => {
   const scenarioMap = {
-    'ssp126': { label: 'SSP1-2.6', shortLabel: 'Low Emissions', description: 'Sustainability pathway' },
-    'ssp245': { label: 'SSP2-4.5', shortLabel: 'Medium Emissions', description: 'Middle-of-the-road pathway' },
-    'ssp370': { label: 'SSP3-7.0', shortLabel: 'High Emissions', description: 'Regional rivalry pathway' },
-    'ssp585': { label: 'SSP5-8.5', shortLabel: 'Very High Emissions', description: 'Fossil-fueled development' }
+    'ssp126': {
+      label: 'SSP1-2.6',
+      shortLabel: 'Low Emissions',
+      fullLabel: 'SSP1-2.6 Low emissions',
+      description: 'Sustainability pathway'
+    },
+    'ssp245': {
+      label: 'SSP2-4.5',
+      shortLabel: 'Medium Emissions',
+      fullLabel: 'SSP2-4.5 Medium emissions',
+      description: 'Middle-of-the-road pathway'
+    },
+    'ssp370': {
+      label: 'SSP3-7.0',
+      shortLabel: 'High Emissions',
+      fullLabel: 'SSP3-7.0 High emissions',
+      description: 'Regional rivalry pathway'
+    },
+    'ssp585': {
+      label: 'SSP5-8.5',
+      shortLabel: 'Very High Emissions',
+      fullLabel: 'SSP5-8.5 Very high emissions',
+      description: 'Fossil-fueled development'
+    }
   };
-  return scenarioMap[scenario] || { label: scenario, shortLabel: scenario, description: '' };
+  return scenarioMap[scenario] || {
+    label: scenario,
+    shortLabel: scenario,
+    fullLabel: scenario,
+    description: ''
+  };
 };
 
 /**

@@ -85,7 +85,7 @@ const ClimateLayer = () => {
           <p style="margin: 4px 0;"><strong>District:</strong> ${props.district_name} (${props.district_code})</p>
           <hr style="margin: 8px 0; border: none; border-top: 1px solid #ddd;" />
           <p style="margin: 4px 0;"><strong>Index:</strong> ${props.index_code?.toUpperCase()}</p>
-          <p style="margin: 4px 0;"><strong>Scenario:</strong> ${formatScenario(props.scenario).label}</p>
+          <p style="margin: 4px 0;"><strong>Scenario:</strong> ${formatScenario(props.scenario).fullLabel}</p>
           <p style="margin: 4px 0;"><strong>Period:</strong> ${props.period_start}-${props.period_end}</p>
           <p style="margin: 8px 0 4px 0; font-size: 14px;">
             <strong>Value:</strong>

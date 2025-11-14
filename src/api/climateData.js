@@ -6,7 +6,7 @@ import apiClient from './client';
  * @returns {Promise} Climate data for all scenarios and periods
  */
 export const getClimateDataByMunicipality = async (municipalityId) => {
-  const response = await apiClient.get(`/api/climate-data/${municipalityId}`);
+  const response = await apiClient.get(`/climate-data/${municipalityId}`);
   return response.data;
 };
 
@@ -18,7 +18,7 @@ export const getClimateDataByMunicipality = async (municipalityId) => {
  * @returns {Promise} Climate data
  */
 export const getClimateDataByScenarioPeriod = async (municipalityId, scenario, period) => {
-  const response = await apiClient.get(`/api/climate-data/${municipalityId}/${scenario}/${period}`);
+  const response = await apiClient.get(`/climate-data/${municipalityId}/${scenario}/${period}`);
   return response.data;
 };
 
@@ -30,7 +30,7 @@ export const getClimateDataByScenarioPeriod = async (municipalityId, scenario, p
  * @returns {Promise} GeoJSON FeatureCollection with 213 municipality polygons
  */
 export const getClimateGeoJSON = async (scenario, period, index) => {
-  const response = await apiClient.get(`/api/climate-data/geojson/${scenario}/${period}/${index}`);
+  const response = await apiClient.get(`/climate-data/geojson/${scenario}/${period}/${index}`);
   return response.data;
 };
 
@@ -39,7 +39,7 @@ export const getClimateGeoJSON = async (scenario, period, index) => {
  * @returns {Promise} List of SSP scenarios
  */
 export const getScenarios = async () => {
-  const response = await apiClient.get('/api/climate-data/scenarios');
+  const response = await apiClient.get('/climate-data/scenarios');
   return response.data;
 };
 
@@ -48,7 +48,7 @@ export const getScenarios = async () => {
  * @returns {Promise} List of time periods with start/end years
  */
 export const getPeriods = async () => {
-  const response = await apiClient.get('/api/climate-data/periods');
+  const response = await apiClient.get('/climate-data/periods');
   return response.data;
 };
 
@@ -60,7 +60,7 @@ export const getPeriods = async () => {
  * @returns {Promise} Aggregated district climate data
  */
 export const getDistrictClimateData = async (districtCode, scenario, period) => {
-  const response = await apiClient.get(`/api/climate-data/district/${districtCode}/${scenario}/${period}`);
+  const response = await apiClient.get(`/climate-data/district/${districtCode}/${scenario}/${period}`);
   return response.data;
 };
 
@@ -69,7 +69,7 @@ export const getDistrictClimateData = async (districtCode, scenario, period) => 
  * @returns {Promise} Cache stats (hits, misses, size)
  */
 export const getCacheStats = async () => {
-  const response = await apiClient.get('/api/cache/stats');
+  const response = await apiClient.get('/cache/stats');
   return response.data;
 };
 
@@ -78,7 +78,7 @@ export const getCacheStats = async () => {
  * @returns {Promise} Success message
  */
 export const clearCache = async () => {
-  const response = await apiClient.post('/api/cache/clear');
+  const response = await apiClient.post('/cache/clear');
   return response.data;
 };
 

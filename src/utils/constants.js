@@ -1,7 +1,7 @@
 // API Configuration
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/climate-tool/api';
 
-// Map Configuration (matching risk-profiler-web defaults)
+// Map Configuration (matching climate-tool-web defaults)
 export const MAP_CONFIG = {
   center: [
     parseFloat(import.meta.env.VITE_MAP_CENTER_LAT) || -28.75,
@@ -18,7 +18,7 @@ export const SA_BOUNDS = [
   [-22.0, 33.0]  // Northeast
 ];
 
-// SSP Scenarios (fallback - these can be fetched from /api/climate-data/scenarios)
+// SSP Scenarios (fallback - these can be fetched from /climate-data/scenarios)
 export const SCENARIOS = [
   { value: 'ssp126', label: 'SSP1-2.6 (Low Emissions)', description: 'Sustainability pathway' },
   { value: 'ssp245', label: 'SSP2-4.5 (Medium Emissions)', description: 'Middle-of-the-road pathway' },
@@ -26,7 +26,7 @@ export const SCENARIOS = [
   { value: 'ssp585', label: 'SSP5-8.5 (Very High Emissions)', description: 'Fossil-fueled development' }
 ];
 
-// Time Periods (fallback - these can be fetched from /api/climate-data/periods)
+// Time Periods (fallback - these can be fetched from /climate-data/periods)
 export const PERIODS = [
   {
     value: 'near-term_2021-2040',

@@ -1,10 +1,9 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../utils/constants';
 
-// Create axios instance with base configuration
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000, // 30 seconds
+  timeout: 60000, // 60 seconds
   headers: {
     'Content-Type': 'application/json',
   },
@@ -13,7 +12,7 @@ const apiClient = axios.create({
 // Request interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    // You can add auth tokens here if needed in the future
+    // TODO: add auth tokens here if needed in the future
     return config;
   },
   (error) => {

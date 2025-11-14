@@ -23,6 +23,7 @@ function AppContent() {
   const { comparisonMode, fetchClimateData, scenario, period, index } = useClimate();
   const [mapInstance, setMapInstance] = useState(null);
   const [comparisonMaps, setComparisonMaps] = useState(null);
+  const [searchHighlightedMunicipalityId, setSearchHighlightedMunicipalityId] = useState(null);
 
   // Fetch initial climate data on mount and when config changes
   useEffect(() => {
@@ -36,6 +37,9 @@ function AppContent() {
 
   // Handle municipality selection - zoom to municipality
   const handleMunicipalitySelect = (municipality) => {
+    // Update search highlight
+    setSearchHighlightedMunicipalityId(municipality?.id || null);
+
     // In comparison mode, zoom both maps
     if (comparisonMode && comparisonMaps) {
       const { mapA, mapB } = comparisonMaps;
@@ -142,11 +146,14 @@ function AppContent() {
         {/* Map Container */}
         <main className="flex-1 relative">
           {comparisonMode ? (
-            <ComparisonView onMapsReady={handleComparisonMapsReady} />
+            <ComparisonView
+              onMapsReady={handleComparisonMapsReady}
+              searchHighlightedMunicipalityId={searchHighlightedMunicipalityId}
+            />
           ) : (
             <>
               <Map onMapReady={setMapInstance}>
-                <ClimateLayer />
+                <ClimateLayer searchHighlightedMunicipalityId={searchHighlightedMunicipalityId} />
               </Map>
               <Legend />
               <InfoPanel />

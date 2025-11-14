@@ -21,7 +21,7 @@ import 'leaflet/dist/leaflet.css';
  * Leverages existing Map, ClimateLayer, Legend components
  * Synchronizes period and index between both maps
  */
-const ComparisonView = ({ onMapsReady }) => {
+const ComparisonView = ({ onMapsReady, searchHighlightedMunicipalityId = null }) => {
   const {
     scenario,
     period,
@@ -41,6 +41,10 @@ const ComparisonView = ({ onMapsReady }) => {
   // Selected municipality for comparison
   const [selectedMunicipality, setSelectedMunicipality] = useState(null);
 
+  // Refs to track ongoing fetches and prevent duplicates
+  const fetchingA = useRef(false);
+  const fetchingB = useRef(false);
+
   // Notify parent when both maps are ready
   useEffect(() => {
     if (mapA && mapB && onMapsReady) {
@@ -59,7 +63,15 @@ const ComparisonView = ({ onMapsReady }) => {
     if (!comparisonMode) return;
 
     const fetchDataA = async () => {
+      // Prevent duplicate fetches
+      if (fetchingA.current) {
+        console.log('Scenario A fetch already in progress, skipping...');
+        return;
+      }
+
+      fetchingA.current = true;
       setLoadingA(true);
+
       try {
         const data = await getClimateGeoJSON(scenario, period, index);
         setGeojsonA(data);
@@ -67,6 +79,7 @@ const ComparisonView = ({ onMapsReady }) => {
         console.error('Error fetching scenario A data:', error);
       } finally {
         setLoadingA(false);
+        fetchingA.current = false;
       }
     };
 
@@ -78,7 +91,15 @@ const ComparisonView = ({ onMapsReady }) => {
     if (!comparisonMode) return;
 
     const fetchDataB = async () => {
+      // Prevent duplicate fetches
+      if (fetchingB.current) {
+        console.log('Scenario B fetch already in progress, skipping...');
+        return;
+      }
+
+      fetchingB.current = true;
       setLoadingB(true);
+
       try {
         const data = await getClimateGeoJSON(comparisonScenario, period, index);
         setGeojsonB(data);
@@ -86,6 +107,7 @@ const ComparisonView = ({ onMapsReady }) => {
         console.error('Error fetching scenario B data:', error);
       } finally {
         setLoadingB(false);
+        fetchingB.current = false;
       }
     };
 
@@ -154,6 +176,7 @@ const ComparisonView = ({ onMapsReady }) => {
               indexMetadata={indexMetadata}
               onMunicipalityClick={setSelectedMunicipality}
               selectedMunicipalityId={selectedMunicipality?.id}
+              searchHighlightedMunicipalityId={searchHighlightedMunicipalityId}
             />
           )}
           <MapInitializer setMapInstance={setMapA} />
@@ -213,6 +236,7 @@ const ComparisonView = ({ onMapsReady }) => {
               indexMetadata={indexMetadata}
               onMunicipalityClick={setSelectedMunicipality}
               selectedMunicipalityId={selectedMunicipality?.id}
+              searchHighlightedMunicipalityId={searchHighlightedMunicipalityId}
             />
           )}
           <MapInitializer setMapInstance={setMapB} />
@@ -250,7 +274,7 @@ const ComparisonView = ({ onMapsReady }) => {
  * ComparisonClimateLayer - Renders GeoJSON for comparison view
  * Similar to ClimateLayer but accepts data/metadata as props
  */
-const ComparisonClimateLayer = ({ geojsonData, indexMetadata, onMunicipalityClick, selectedMunicipalityId }) => {
+const ComparisonClimateLayer = ({ geojsonData, indexMetadata, onMunicipalityClick, selectedMunicipalityId, searchHighlightedMunicipalityId = null }) => {
   const [hoveredMunicipalityId, setHoveredMunicipalityId] = useState(null);
 
   // Create color scale from data
@@ -265,10 +289,24 @@ const ComparisonClimateLayer = ({ geojsonData, indexMetadata, onMunicipalityClic
     const value = feature.properties.value;
     const municipalityId = feature.properties.id;
 
+    // Determine if this municipality should be grayed out (search highlight active but not this one)
+    const isGrayedOut = searchHighlightedMunicipalityId && searchHighlightedMunicipalityId !== municipalityId;
+
     // Determine fill color based on climate value
     const fillColor = colorScale
       ? getColorForValue(value, colorScale)
       : DEFAULT_STYLE.fillColor;
+
+    // If grayed out, use gray color
+    if (isGrayedOut) {
+      return {
+        ...DEFAULT_STYLE,
+        fillColor: '#e5e7eb',
+        fillOpacity: 0.4,
+        color: '#d1d5db',
+        weight: 1,
+      };
+    }
 
     // Apply selected style if selected
     if (selectedMunicipalityId === municipalityId) {
@@ -371,8 +409,8 @@ const ComparisonClimateLayer = ({ geojsonData, indexMetadata, onMunicipalityClic
   const key = useMemo(() => {
     if (!geojsonData) return 'empty';
     const firstFeature = geojsonData.features?.[0]?.properties;
-    return `${firstFeature?.scenario}-${firstFeature?.period}-${firstFeature?.index_code}-${selectedMunicipalityId || 'none'}`;
-  }, [geojsonData, selectedMunicipalityId]);
+    return `${firstFeature?.scenario}-${firstFeature?.period}-${firstFeature?.index_code}-${selectedMunicipalityId || 'none'}-${searchHighlightedMunicipalityId || 'none'}`;
+  }, [geojsonData, selectedMunicipalityId, searchHighlightedMunicipalityId]);
 
   if (!geojsonData || !geojsonData.features || geojsonData.features.length === 0) {
     return null;

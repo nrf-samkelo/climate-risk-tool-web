@@ -5,7 +5,7 @@ import apiClient from './client';
  * @returns {Promise} Array of municipalities
  */
 export const getAllMunicipalities = async () => {
-  const response = await apiClient.get('/api/municipalities');
+  const response = await apiClient.get('/municipalities');
   return response.data;
 };
 
@@ -15,7 +15,7 @@ export const getAllMunicipalities = async () => {
  * @returns {Promise} Municipality data
  */
 export const getMunicipalityById = async (id) => {
-  const response = await apiClient.get(`/api/municipalities/${id}`);
+  const response = await apiClient.get(`/municipalities/${id}`);
   return response.data;
 };
 
@@ -25,7 +25,7 @@ export const getMunicipalityById = async (id) => {
  * @returns {Promise} Array of municipalities
  */
 export const getMunicipalitiesByProvince = async (province) => {
-  const response = await apiClient.get(`/api/municipalities/province/${province}`);
+  const response = await apiClient.get(`/municipalities/province/${province}`);
   return response.data;
 };
 
@@ -35,7 +35,7 @@ export const getMunicipalitiesByProvince = async (province) => {
  * @returns {Promise} Array of municipalities
  */
 export const getMunicipalitiesByDistrict = async (districtCode) => {
-  const response = await apiClient.get(`/api/municipalities/district/${districtCode}`);
+  const response = await apiClient.get(`/municipalities/district/${districtCode}`);
   return response.data;
 };
 
@@ -44,6 +44,6 @@ export const getMunicipalitiesByDistrict = async (districtCode) => {
  * @returns {Promise} Summary statistics
  */
 export const getMunicipalitySummary = async () => {
-  const response = await apiClient.get('/api/municipalities/stats/summary');
+  const response = await apiClient.get('/municipalities/stats/summary');
   return response.data;
 };

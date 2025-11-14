@@ -15,7 +15,7 @@ import { DEFAULT_STYLE, HOVER_STYLE, SELECTED_STYLE } from '../../utils/constant
  * ClimateLayer - Renders GeoJSON municipality polygons with climate data styling
  * Leverages API response properties for dynamic coloring and popups
  */
-const ClimateLayer = () => {
+const ClimateLayer = ({ searchHighlightedMunicipalityId = null }) => {
   const { geojsonData, selectedMunicipality, setSelectedMunicipality } = useClimate();
   const { getIndexByCode } = useIndices();
   const [hoveredMunicipalityId, setHoveredMunicipalityId] = useState(null);
@@ -43,10 +43,24 @@ const ClimateLayer = () => {
     const value = feature.properties.value;
     const municipalityId = feature.properties.id;
 
+    // Determine if this municipality should be grayed out (search highlight active but not this one)
+    const isGrayedOut = searchHighlightedMunicipalityId && searchHighlightedMunicipalityId !== municipalityId;
+
     // Determine fill color based on climate value
     const fillColor = colorScale
       ? getColorForValue(value, colorScale)
       : DEFAULT_STYLE.fillColor;
+
+    // If grayed out, use gray color
+    if (isGrayedOut) {
+      return {
+        ...DEFAULT_STYLE,
+        fillColor: '#e5e7eb',
+        fillOpacity: 0.4,
+        color: '#d1d5db',
+        weight: 1,
+      };
+    }
 
     // Apply different styles based on state
     if (selectedMunicipality?.id === municipalityId) {
@@ -152,8 +166,8 @@ const ClimateLayer = () => {
   // Force re-render when data or styles change
   const key = useMemo(() => {
     if (!geojsonData) return 'empty';
-    return `${metadata?.scenario}-${metadata?.period}-${metadata?.indexCode}-${selectedMunicipality?.id || 'none'}`;
-  }, [geojsonData, metadata, selectedMunicipality]);
+    return `${metadata?.scenario}-${metadata?.period}-${metadata?.indexCode}-${selectedMunicipality?.id || 'none'}-${searchHighlightedMunicipalityId || 'none'}`;
+  }, [geojsonData, metadata, selectedMunicipality, searchHighlightedMunicipalityId]);
 
   if (!geojsonData || !geojsonData.features || geojsonData.features.length === 0) {
     return null;

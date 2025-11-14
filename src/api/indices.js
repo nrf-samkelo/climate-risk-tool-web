@@ -7,7 +7,8 @@ import apiClient from './client';
  * @returns {Promise} Array of all climate indices
  */
 export const getAllIndices = async () => {
-  const response = await apiClient.get('/api/indices');
+  const response = await apiClient.get('/indices');
+  console.log('Fetched all indices samkelo:', response.data);
   return response.data;
 };
 
@@ -17,7 +18,7 @@ export const getAllIndices = async () => {
  * @returns {Promise} Single index with metadata
  */
 export const getIndexByCode = async (code) => {
-  const response = await apiClient.get(`/api/indices/${code}`);
+  const response = await apiClient.get(`/indices/${code}`);
   return response.data;
 };
 
@@ -27,7 +28,7 @@ export const getIndexByCode = async (code) => {
  * @returns {Promise} Array of indices in category
  */
 export const getIndicesByCategory = async (category) => {
-  const response = await apiClient.get(`/api/indices/category/${category}`);
+  const response = await apiClient.get(`/indices/category/${category}`);
   return response.data;
 };
 
@@ -36,7 +37,7 @@ export const getIndicesByCategory = async (category) => {
  * @returns {Promise} Category summary statistics
  */
 export const getCategoryStats = async () => {
-  const response = await apiClient.get('/api/indices/stats/categories');
+  const response = await apiClient.get('/indices/stats/categories');
   return response.data;
 };
 
@@ -45,7 +46,7 @@ export const getCategoryStats = async () => {
  * @returns {Promise} Overall summary statistics
  */
 export const getIndicesSummary = async () => {
-  const response = await apiClient.get('/api/indices/stats/summary');
+  const response = await apiClient.get('/indices/stats/summary');
   return response.data;
 };
 
@@ -55,7 +56,7 @@ export const getIndicesSummary = async () => {
  * @returns {Promise} Sector reference with explanations
  */
 export const getSectors = async () => {
-  const response = await apiClient.get('/api/indices/sectors');
+  const response = await apiClient.get('/indices/sectors');
   return response.data;
 };
 
@@ -65,7 +66,7 @@ export const getSectors = async () => {
  * @returns {Promise} Color scheme documentation
  */
 export const getColorSchemes = async () => {
-  const response = await apiClient.get('/api/indices/color-schemes');
+  const response = await apiClient.get('/indices/color-schemes');
   return response.data;
 };
 
@@ -74,6 +75,6 @@ export const getColorSchemes = async () => {
  * @returns {Promise} Indices organized by sector relevance
  */
 export const getIndicesBySector = async () => {
-  const response = await apiClient.get('/api/indices/stats/by-sector');
+  const response = await apiClient.get('/indices/stats/by-sector');
   return response.data;
 };

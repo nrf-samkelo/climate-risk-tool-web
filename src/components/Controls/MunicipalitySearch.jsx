@@ -34,7 +34,7 @@ const MunicipalitySearch = ({ onSelect }) => {
               name: m.municipality_name || m.name,
               province: m.province,
               district: m.district_name,
-              // Calculate bbox from centroid (approximate ±0.5 degrees)
+              id: m.id,
               bbox: m.bbox || [
                 lon - 0.5,
                 lat - 0.5,

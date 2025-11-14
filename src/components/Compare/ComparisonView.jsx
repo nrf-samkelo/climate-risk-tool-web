@@ -127,7 +127,7 @@ const ComparisonView = ({ onMapsReady, searchHighlightedMunicipalityId = null })
       {/* Left Map - Scenario A */}
       <div className="flex-1 relative border-r-2 border-gray-300">
         {/* Scenario A Label */}
-        <div className="absolute top-4 left-4 z-1000 bg-white rounded-lg shadow-md px-3 py-2">
+        <div className="absolute top-4 left-16 z-1000 bg-white rounded-lg shadow-md px-3 py-2">
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-bold text-gray-800">Scenario A</h3>
             {loadingA && (
@@ -187,7 +187,7 @@ const ComparisonView = ({ onMapsReady, searchHighlightedMunicipalityId = null })
       {/* Right Map - Scenario B */}
       <div className="flex-1 relative">
         {/* Scenario B Label */}
-        <div className="absolute top-4 left-4 z-1000 bg-white rounded-lg shadow-md px-3 py-2">
+        <div className="absolute top-4 left-16 z-1000 bg-white rounded-lg shadow-md px-3 py-2">
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-bold text-gray-800">Scenario B</h3>
             {loadingB && (

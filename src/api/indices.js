@@ -8,7 +8,6 @@ import apiClient from './client';
  */
 export const getAllIndices = async () => {
   const response = await apiClient.get('/indices');
-  console.log('Fetched all indices samkelo:', response.data);
   return response.data;
 };
 

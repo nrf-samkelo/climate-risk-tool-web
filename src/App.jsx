@@ -15,6 +15,7 @@ import ComparisonToggle from './components/Controls/ComparisonToggle';
 import ComparisonScenarioSelector from './components/Controls/ComparisonScenarioSelector';
 import ComparisonView from './components/Compare/ComparisonView';
 import MunicipalitySearch from './components/Controls/MunicipalitySearch';
+import DataAttribution from './components/Common/DataAttribution';
 
 /**
  * Main application layout
@@ -109,38 +110,45 @@ function AppContent() {
             Climate Risk Tool
           </h1>
           <p className="text-xs opacity-80">
-            South African Municipalities - Climate Projections
+            Downscaled Climate Projections • South African Municipalities
           </p>
         </div>
-        {comparisonMode && (
-          <div className="bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium">
-            Comparison Mode Active
-          </div>
-        )}
+        {/* SAEON & NRF Logo */}
+        <div className="flex items-center">
+          <img
+            src="/climate-tool/saeon.svg"
+            alt="SAEON - South African Environmental Observation Network & NRF"
+            className="h-10 object-contain"
+          />
+        </div>
       </header>
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar - Controls (Always visible, adapts to comparison mode) */}
-        <aside className="w-72 bg-white border-r border-gray-200 overflow-y-auto p-3 space-y-3">
-          <MunicipalitySearch onSelect={handleMunicipalitySelect} />
-          <div className="border-t border-gray-200 pt-3">
-            <ScenarioSelector />
-          </div>
-          {comparisonMode && (
+        <aside className="w-72 bg-white border-r border-gray-200 flex flex-col overflow-hidden">
+          <div className="flex-1 overflow-y-auto p-3 space-y-3">
+            <MunicipalitySearch onSelect={handleMunicipalitySelect} />
             <div className="border-t border-gray-200 pt-3">
-              <ComparisonScenarioSelector />
+              <ScenarioSelector />
             </div>
-          )}
-          <div className="border-t border-gray-200 pt-3">
-            <PeriodSelector />
+            {comparisonMode && (
+              <div className="border-t border-gray-200 pt-3">
+                <ComparisonScenarioSelector />
+              </div>
+            )}
+            <div className="border-t border-gray-200 pt-3">
+              <PeriodSelector />
+            </div>
+            <div className="border-t border-gray-200 pt-3">
+              <IndexSelector />
+            </div>
+            <div className="border-t border-gray-200 pt-3">
+              <ComparisonToggle />
+            </div>
           </div>
-          <div className="border-t border-gray-200 pt-3">
-            <IndexSelector />
-          </div>
-          <div className="border-t border-gray-200 pt-3">
-            <ComparisonToggle />
-          </div>
+          {/* Data Attribution Footer */}
+          <DataAttribution variant="full" />
         </aside>
 
         {/* Map Container */}

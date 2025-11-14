@@ -1,0 +1,25 @@
+{
+  "name": "Climate Risk Tool - South Africa",
+  "short_name": "Climate Tool",
+  "description": "Downscaled Climate Projections for South African Municipalities",
+  "start_url": "/climate-tool/",
+  "scope": "/climate-tool/",
+  "icons": [
+    {
+      "src": "/climate-tool/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/climate-tool/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color": "#0f172a",
+  "background_color": "#0f172a",
+  "display": "standalone",
+  "orientation": "any"
+}

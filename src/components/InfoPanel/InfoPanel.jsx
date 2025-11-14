@@ -103,6 +103,12 @@ const InfoPanel = () => {
           {indexMetadata && (
             <InfoRow label="Unit" value={indexMetadata.unit} />
           )}
+          {/* Data source badge */}
+          <div className="mt-2 bg-blue-50 border border-blue-200 rounded px-2 py-1">
+            <p className="text-[9px] text-blue-700 font-medium">
+              Downscaled NEX-GDDP-CMIP6 (~25 km)
+            </p>
+          </div>
         </div>
 
         {/* Index Information - Plain Language & Technical */}
